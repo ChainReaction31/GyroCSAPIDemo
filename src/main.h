@@ -8,6 +8,6 @@
 void printWifiStatus();
 void setup();
 void loop();
-void sendJsonData(float x, float y, float z, float x2, float y2, float z2);
+void sendJsonData(int16_t x, int16_t y, int16_t z, int16_t x2, int16_t y2, int16_t z2);
 
 #endif //OGCDEMO_MAIN_H

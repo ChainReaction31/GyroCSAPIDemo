@@ -123,10 +123,10 @@ void loop() {
     GyY = Wire.read() << 8 | Wire.read();
     GyZ = Wire.read() << 8 | Wire.read();
 
-    sendJsonData(GyX / GYRO_CONV, GyY / GYRO_CONV, GyZ / GYRO_CONV, AcX / ACCL_CONV, AcY / ACCL_CONV, AcZ / ACCL_CONV);
+    sendJsonData(GyX, GyY, GyZ, AcX, AcY, AcZ);
 
 
-    delay(333);
+    delay(2);
 }
 
 void printWifiStatus() {
@@ -146,24 +146,32 @@ void printWifiStatus() {
     Serial.println(" dBm");
 }
 
-void sendJsonData(float x, float y, float z, float x2, float y2, float z2) {
+void sendJsonData(int16_t x, int16_t y, int16_t z, int16_t x2, int16_t y2, int16_t z2) {
 
-//    Serial.print("Accelerometer: ");
-//    Serial.print("X = ");
-//    Serial.print(x2);
-//    Serial.print(" | Y = ");
-//    Serial.print(y2);
-//    Serial.print(" | Z = ");
-//    Serial.println(z2);
-//
-//    Serial.print("Gyroscope: ");
-//    Serial.print("X  = ");
-//    Serial.print(x);
-//    Serial.print(" | Y = ");
-//    Serial.print(y);
-//    Serial.print(" | Z = ");
-//    Serial.println(z);
-//    Serial.println(" ");
+    float gyro_x = static_cast<float>(x) / GYRO_CONV;
+    float gyro_y = static_cast<float>(y) / GYRO_CONV;
+    float gyro_z = static_cast<float>(z) / GYRO_CONV;
+    float accl_x = static_cast<float>(x2) / ACCL_CONV;
+    float accl_y = static_cast<float>(y2) / ACCL_CONV;
+    float accl_z = static_cast<float>(z2) / ACCL_CONV;
+
+
+    Serial.print("Accelerometer: ");
+    Serial.print("X = ");
+    Serial.print(accl_x);
+    Serial.print(" | Y = ");
+    Serial.print(accl_y);
+    Serial.print(" | Z = ");
+    Serial.println(accl_z);
+
+    Serial.print("Gyroscope: ");
+    Serial.print("X  = ");
+    Serial.print(gyro_x);
+    Serial.print(" | Y = ");
+    Serial.print(gyro_y);
+    Serial.print(" | Z = ");
+    Serial.println(gyro_z);
+    Serial.println(" ");
 
     RTCTime currentTime;
     RTC.getTime(currentTime);
@@ -174,12 +182,12 @@ void sendJsonData(float x, float y, float z, float x2, float y2, float z2) {
     doc["phenomenonTime"] = curr_time_str;
     doc["resultTime"] = curr_time_str;
     doc["result"]["timestamp"] = unix_time;
-    doc["result"]["gyro-readings"]["x"] = x;
-    doc["result"]["gyro-readings"]["y"] = y;
-    doc["result"]["gyro-readings"]["z"] = z;
-    doc["result"]["accelerometer-readings"]["x"] = x2;
-    doc["result"]["accelerometer-readings"]["y"] = y2;
-    doc["result"]["accelerometer-readings"]["z"] = z2;
+    doc["result"]["gyro-readings"]["x"] = gyro_x;
+    doc["result"]["gyro-readings"]["y"] = gyro_y;
+    doc["result"]["gyro-readings"]["z"] = gyro_z;
+    doc["result"]["accelerometer-readings"]["x"] = accl_x;
+    doc["result"]["accelerometer-readings"]["y"] = accl_y;
+    doc["result"]["accelerometer-readings"]["z"] = accl_z;
 
     // Send the HTTP POST request
     if (client.connect(server, 8585)) {
